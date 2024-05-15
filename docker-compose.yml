@@ -1,0 +1,153 @@
+version: '3.7'
+
+
+services:
+
+
+
+  caddy:
+    image: caddy:2-alpine
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    network_mode: "host"
+
+
+
+
+# note: i ended up using system mosquitto
+
+#  mosquitto:
+#    image: eclipse-mosquitto:latest
+#    volumes:
+#      - ./mosquitto/etc:/mosquitto/config
+#      #- ./data:/mosquitto/data
+#      #- ./log:/mosquitto/log
+#    ports:
+#      - "1883:1883"
+#    restart: unless-stopped
+
+
+
+# note: it should not make sense to run telegraf under docker, but given how many permissions problems there are when running it outside, we might as well give this a try
+
+#  telegraf:
+#    image: telegraf:latest
+#    depends_on:
+#      - influxdb
+#    links:
+#      - influxdb
+#    ports:
+#    - '127.0.0.1:8125:8125/udp'
+#    volumes:
+#    - ./telegraf/etc/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+#    volumes:
+#      #  Sync timezone with host
+#      - /etc/localtime:/etc/localtime:ro
+#      #  Map Telegraf configuration file
+#      - /mnt/influxdb/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+#      #  Map /tmp to permanent storage  (this includes /tmp/metrics.out)
+#      - /mnt/influxdb:/tmp:rw
+#    restart: unless-stopped
+
+
+
+
+
+# note: i ended up using system influxdb
+
+#  influxdb:
+#    image: influxdb:latest
+#    volumes:
+#      - influxdb_data:/var/lib/influxdb2
+#      - ./influxdb_v2/etc:/etc/influxdb2
+#      - ./influxdb_v2/scripts:/docker-entrypoint-initdb.d
+#    ports:
+#      - 8086:8086
+#    network_mode: "host"
+#    restart: unless-stopped
+#    environment:
+#      DOCKER_INFLUXDB_INIT_MODE: setup
+#      DOCKER_INFLUXDB_INIT_USERNAME: uuuuuuuuuuuuuuu
+#      DOCKER_INFLUXDB_INIT_PASSWORD: ppppppppppppppp
+#      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: TTTTTTTTTTTTTTTTTTTT==
+#      DOCKER_INFLUXDB_INIT_ORG: sfi
+#      DOCKER_INFLUXDB_INIT_BUCKET: iot
+#      INFLUXD_SESSION_LENGTH: 99999
+#      INFLUXD_LOG_LEVEL: debug
+
+# note: configuring (dockerized) influx automatically is a bit of a problem
+
+#influx auth create --org sfi --user  uuuuuu -d hovno --write-buckets --json
+#influx v1 auth create --org sfi --d kkkkkk --username uuuuuuuuu --password pppppppp --write-bucket snsnsnsn
+# todo: https://docs.influxdata.com/influxdb/cloud/admin/tokens/create-token/
+# create tokens with python from outside the container, and distribute to clients?
+#influx user create --name uuuuu -p pppppppp
+#influx bucket create machines
+#influx
+#influx org
+#influx org create sfi
+#influx org create --name sfi
+#influx bucket create --org sfi --name machines
+#influx bucket create --org sfi --name iot
+#influx auth create --all-access -u
+#influx auth
+#influx auth ls
+#influx auth create --all-access
+
+
+
+
+  alertmanager:
+    image: quay.io/prometheus/alertmanager:latest
+    volumes:
+      - alertmanager_storage:/data
+      - alertmanager_etc:/etc/alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    network_mode: "host"
+
+
+
+  karma:
+    image: ghcr.io/prymitive/karma:latest
+    volumes:
+      - "./karma/:/etc/karma/"
+    environment:
+      CONFIG_FILE: "/etc/karma/karma.yaml"
+    network_mode: "host"
+
+
+
+  esphome_mqtt_to_influx2:
+    image: koo5/esphome_mqtt_to_influx2:latest
+    restart: unless-stopped
+    network_mode: "host"
+    build:
+      context: ./esphome_mqtt_to_influx2
+      dockerfile: Dockerfile
+    environment:
+      SECRETS_DIR: /run/secrets/
+    secrets:
+      - secrets.json
+
+
+
+secrets:
+  secrets.json:
+    file: esphome_mqtt_to_influx2/secrets/secrets.json
+
+
+volumes:
+  caddy_data:
+  caddy_config:
+  influxdb_data:
+  esphome2influxdb_logs:
+  mqtt_logs:
+  alertmanager_storage:
+  alertmanager_etc:
+
+

@@ -1,0 +1,91 @@
+#authorization:
+#  acl:
+#    silences: /etc/acls.yaml
+
+alertmanager:
+  interval: 10s
+  servers:
+    - name: single
+      uri: "http://localhost:9093"
+      timeout: 10s
+      proxy: true
+      cors:
+        credentials: same-origin
+      healthcheck:
+        filters:
+          DeadMansSwitch:
+            - alertname=DeadMansSwitch
+
+alertAcknowledgement:
+  enabled: true
+  duration: 15m0s
+  author: karma-ack
+
+debug: true
+
+
+grid:
+  sorting:
+    order: label
+    reverse: false
+    label: cluster
+    customValues:
+      labels:
+        cluster:
+          prod: 1
+          staging: 2
+          dev: 3
+        severity:
+          critical: 1
+          warning: 2
+          info: 3
+  auto:
+    order:
+      - severity
+      - cluster
+    ignore:
+      - region
+
+history:
+  enabled: true
+  timeout: 5s
+  workers: 5
+
+karma:
+  name: karma
+
+log:
+  config: false
+  level: warning
+
+listen:
+  port: 8093
+
+#sentry:
+#  private: ".."
+#  public: ".."
+
+ui:
+  refresh: 10s
+  hideFiltersWhenIdle: true
+  colorTitlebar: false
+  theme: auto
+  animations: true
+  minimalGroupWidth: 420
+  alertsPerGroup: 5
+  collapseGroups: collapsedOnMobile
+  multiGridLabel: severity
+  multiGridSortReverse: false
+
+annotations:
+  default:
+    hidden: false
+
+
+
+
+#listen:
+#  prefix: /karma/
+
+
+
