@@ -122,12 +122,12 @@ services:
 
 
 
-  esphome_mqtt_to_influx2:
-    image: koo5/esphome_mqtt_to_influx2:latest
+  esphome_mqtt_to_influx:
+    image: koo5/esphome_mqtt_to_influx:latest
     restart: unless-stopped
     network_mode: "host"
     build:
-      context: ./esphome_mqtt_to_influx2
+      context: ./esphome_mqtt_to_influx
       dockerfile: Dockerfile
     environment:
       SECRETS_DIR: /run/secrets/

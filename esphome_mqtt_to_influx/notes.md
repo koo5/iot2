@@ -1,0 +1,41 @@
+
+
+
+## esphome - the problem of esphome not sending out value updates as long as the value stays the same
+
+i'm still trying to solve this for actions / switches / scripts
+
+for sensors, it's:
+```
+    
+    filters:
+
+		...      
+
+      
+      - heartbeat: 5s
+
+
+```
+
+
+
+
+
+also:
+
+```
+Oh man, RTFM... :) no but really, for this exact reason every single update_interval option in the docs has a "See Default Filter." link so that users can find out about this quicker. Closing...
+???
+
+Sensor Component
+force_update
+force_update (Optional, boolean): If true, this option will force the frontend (usually Home Assistant) to create a state changed event when the sensor updates even if the value stayed the same. Some applications like Grafana require this when working with Home Assistant, but beware it can significantly increase the database size. Defaults to false.
+```
+
+--
+
+another thing to consider is to collect last value of each topic here in the script, and resend it periodically. easy.
+
+also, look into grafana live protocol .. but use multiple points in one call.
+

@@ -1,3 +1,0 @@
-[submodule "esphome_mqtt_to_influx2"]
-	path = esphome_mqtt_to_influx2
-	url = ./esphome_mqtt_to_influx2
