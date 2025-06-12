@@ -1,6 +1,6 @@
 My iot/monitoring server stack. 
 
-## esphome_mqtt_to_influx2 
+## esphome_mqtt_to_influx
 might be of interest to you.
 
 

@@ -11,6 +11,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
+      - ./html:/html
     restart: unless-stopped
     network_mode: "host"
 
@@ -149,5 +150,3 @@ volumes:
   mqtt_logs:
   alertmanager_storage:
   alertmanager_etc:
-
-
